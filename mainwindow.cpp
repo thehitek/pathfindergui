@@ -1,4 +1,6 @@
 #include <QRandomGenerator>
+#include <QSettings>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "gridcell.h"
@@ -10,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     initConnections();
+    readSettings();
 }
 
 MainWindow::~MainWindow()
@@ -18,9 +21,22 @@ MainWindow::~MainWindow()
     delete m_scene;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(QString("config.ini"), QSettings::IniFormat);
+    settings.setValue("geometry", saveGeometry());
+    QMainWindow::closeEvent(event);
+}
+
 void MainWindow::initConnections()
 {
     connect(ui->generateButton, &QPushButton::clicked, this, &MainWindow::onGenerateButtonClicked);
+}
+
+void MainWindow::readSettings()
+{
+    QSettings settings(QString("config.ini"), QSettings::IniFormat);
+    restoreGeometry(settings.value("geometry").toByteArray());
 }
 
 void MainWindow::onGenerateButtonClicked()
