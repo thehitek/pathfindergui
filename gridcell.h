@@ -3,19 +3,24 @@
 
 #include <QGraphicsRectItem>
 #include <QGraphicsItem>
+#include <QGraphicsSceneHoverEvent>
 
 class GridCell : public QGraphicsRectItem
 {
-
 public:
     GridCell(int xPos, int yPos, bool obstacle = false, int sizeInPixels = 30);
     bool isObstacle();
 
+    int xPos() const;
+
+    int yPos() const;
+
 private:
     int m_xPos;
     int m_yPos;
-    bool m_obstacleState;
     int m_sizeInPixels;
+
+    bool m_obstacleState;
 };
 
 #endif // GRIDCELL_H

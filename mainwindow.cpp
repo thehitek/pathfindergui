@@ -2,8 +2,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "gridcell.h"
-#include <algorithm>
-#include "bfs.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -28,7 +26,11 @@ void MainWindow::initConnections()
 void MainWindow::onGenerateButtonClicked()
 {
     if (m_scene != nullptr) delete m_scene;
-    m_scene = new QGraphicsScene();
+    m_cellFrom.reset();
+    m_cellTo.reset();
+
+    m_scene = new QGraphicsScene(ui->graphicsView);
+    connect(m_scene, &QGraphicsScene::selectionChanged, this, &MainWindow::onSceneSelectionChanged);
 
     const int maxHeight = ui->heightSpinBox->value();
     const int maxWidth = ui->widthSpinBox->value();
@@ -36,47 +38,59 @@ void MainWindow::onGenerateButtonClicked()
     const int cellSize = 30;
 
     auto randomizer = QRandomGenerator::global();
-    DDArray<bool> cellAvailability(maxWidth);
-    cellAvailability.fill(QList<bool>(maxHeight));
 
     for (int i = 0; i < maxWidth; i++){
         for (int j = 0; j < maxHeight; j++){
             int randomPercent = randomizer->bounded(0, 100);
             bool isObstacle = randomPercent < obstacleSpawnPercent;
-
-            cellAvailability[i][j] = !isObstacle;
-
             GridCell* cell = new GridCell(i, j, isObstacle, cellSize);
             m_scene->addItem(cell);
         }
     }
 
-    const auto items = m_scene->items();
-
-    QList<GridCell *> cells(maxHeight * maxWidth);
-    std::transform(items.begin(),
-                   items.end(),
-                   cells.begin(),
-                   [](QGraphicsItem* item)
-                   {
-                        // qDebug() << item->scenePos();
-                        return static_cast<GridCell *>(item);
-                   });
-
-    // qDebug() << "Cells: " << cells.length();
     ui->graphicsView->setScene(m_scene);
+}
 
-    BFS bfs(cellAvailability, IntPair(0, 0), IntPair(maxWidth - 1, maxHeight - 1));
-    bfs.calculate();
+void MainWindow::onSceneSelectionChanged() {
+    auto selectedItems = m_scene->selectedItems();
+    if (selectedItems.isEmpty()) return;
 
-    const auto p = bfs.getPath();
-    // qDebug() << p;
+    auto selectedCell = static_cast<GridCell *>(selectedItems.first());
+    qDebug() << selectedCell;
 
-    for (const auto &cell: p) {
-        auto item = m_scene->itemAt(QPointF(cell.first * cellSize, cell.second * cellSize), QTransform());
-        if (item != nullptr) {
-            auto cell = static_cast<QGraphicsRectItem *>(item);
-            cell->setBrush(QBrush(Qt::green));
+    if (m_cellFrom == std::nullopt && m_cellTo == std::nullopt) {
+        selectedCell->setPen(QPen(Qt::yellow, 2));
+        m_cellFrom = IntPair(selectedCell->xPos(), selectedCell->yPos());
+    }
+    else if (m_cellFrom != std::nullopt && m_cellTo == std::nullopt) {
+        selectedCell->setPen(QPen(Qt::blue, 2));
+        m_cellTo = IntPair(selectedCell->xPos(), selectedCell->yPos());
+
+        const int maxHeight = ui->heightSpinBox->value();
+        const int maxWidth = ui->widthSpinBox->value();
+        const int cellSize = 30;
+
+        DDArray<bool> cellAvailability(maxWidth);
+        cellAvailability.fill(QList<bool>(maxHeight));
+
+        const auto items = m_scene->items();
+
+        for (auto item: items) {
+            auto cell = static_cast<GridCell *>(item);
+            cellAvailability[cell->xPos()][cell->yPos()] = !cell->isObstacle();
+        }
+
+        BFS bfs(cellAvailability, m_cellFrom.value(), m_cellTo.value());
+        bfs.calculate();
+
+        const auto p = bfs.getPath();
+
+        for (const auto &cell: p) {
+            auto item = m_scene->itemAt(QPointF(cell.first * 30, cell.second * 30), QTransform());
+            if (item != nullptr) {
+                auto cell = static_cast<QGraphicsRectItem *>(item);
+                cell->setBrush(QBrush(Qt::green));
+            }
         }
     }
 }

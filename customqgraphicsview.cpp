@@ -5,7 +5,6 @@ CustomQGraphicsView::CustomQGraphicsView(QWidget *parent)
 
 void CustomQGraphicsView::wheelEvent(QWheelEvent *event) {
     const QPoint angleDelta = event->angleDelta();
-    // qDebug() << angleDelta;
 
     // расчет масштаба
     const double scaleFactor = 1.05;
