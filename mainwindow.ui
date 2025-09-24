@@ -521,7 +521,7 @@
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>120</y>
+      <y>150</y>
       <width>131</width>
       <height>51</height>
      </rect>
@@ -539,6 +539,9 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>1000</number>
+    </property>
     <property name="value">
      <number>10</number>
     </property>
@@ -551,6 +554,9 @@
       <width>42</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
     </property>
     <property name="value">
      <number>10</number>
@@ -604,8 +610,43 @@
       <height>22</height>
      </rect>
     </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
     <property name="value">
      <number>5</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="cellSizeLabel">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>110</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cell size</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="cellSizeSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>110</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="singleStep">
+     <number>5</number>
+    </property>
+    <property name="value">
+     <number>30</number>
     </property>
    </widget>
   </widget>

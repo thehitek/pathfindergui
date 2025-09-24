@@ -35,7 +35,7 @@ void MainWindow::onGenerateButtonClicked()
     const int maxHeight = ui->heightSpinBox->value();
     const int maxWidth = ui->widthSpinBox->value();
     const int obstacleSpawnPercent = ui->obstaclesPercentSpinBox->value();
-    const int cellSize = 30;
+    const int cellSize = ui->cellSizeSpinBox->value();
 
     auto randomizer = QRandomGenerator::global();
 
@@ -68,7 +68,7 @@ void MainWindow::onSceneSelectionChanged() {
 
         const int maxHeight = ui->heightSpinBox->value();
         const int maxWidth = ui->widthSpinBox->value();
-        const int cellSize = 30;
+        const int cellSize = ui->cellSizeSpinBox->value();
 
         DDArray<bool> cellAvailability(maxWidth);
         cellAvailability.fill(QList<bool>(maxHeight));
@@ -86,7 +86,7 @@ void MainWindow::onSceneSelectionChanged() {
         const auto p = bfs.getPath();
 
         for (const auto &cell: p) {
-            auto item = m_scene->itemAt(QPointF(cell.first * 30, cell.second * 30), QTransform());
+            auto item = m_scene->itemAt(QPointF(cell.first * cellSize, cell.second * cellSize), QTransform());
             if (item != nullptr) {
                 auto cell = static_cast<QGraphicsRectItem *>(item);
                 cell->setBrush(QBrush(Qt::green));
