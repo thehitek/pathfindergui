@@ -38,7 +38,7 @@ private:
 
     std::optional<IntPair> m_cellFrom = std::nullopt;
     std::optional<IntPair> m_cellTo = std::nullopt;
-
-
 };
+
+
 #endif // MAINWINDOW_H

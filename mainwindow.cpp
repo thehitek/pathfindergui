@@ -1,5 +1,6 @@
 #include <QRandomGenerator>
 #include <QSettings>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -15,11 +16,19 @@ MainWindow::MainWindow(QWidget *parent)
     readSettings();
 }
 
+
 MainWindow::~MainWindow()
 {
     delete ui;
     delete m_scene;
 }
+
+
+void MainWindow::initConnections()
+{
+    connect(ui->generateButton, &QPushButton::clicked, this, &MainWindow::onGenerateButtonClicked);
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -28,16 +37,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::initConnections()
-{
-    connect(ui->generateButton, &QPushButton::clicked, this, &MainWindow::onGenerateButtonClicked);
-}
 
 void MainWindow::readSettings()
 {
     QSettings settings(QString("config.ini"), QSettings::IniFormat);
     restoreGeometry(settings.value("geometry").toByteArray());
 }
+
 
 void MainWindow::onGenerateButtonClicked()
 {
@@ -67,12 +73,19 @@ void MainWindow::onGenerateButtonClicked()
     ui->graphicsView->setScene(m_scene);
 }
 
+
 void MainWindow::onSceneSelectionChanged() {
     auto selectedItems = m_scene->selectedItems();
     if (selectedItems.isEmpty()) return;
 
     auto selectedCell = static_cast<GridCell *>(selectedItems.first());
-    qDebug() << selectedCell;
+
+    if (selectedCell->isObstacle()) {
+        QMessageBox msgBox;
+        msgBox.setText("This cell is an obstacle, please select another one.");
+        msgBox.exec();
+        return;
+    }
 
     if (m_cellFrom == std::nullopt && m_cellTo == std::nullopt) {
         selectedCell->setPen(QPen(Qt::yellow, 2));

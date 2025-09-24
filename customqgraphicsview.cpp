@@ -1,7 +1,9 @@
 #include "customqgraphicsview.h"
 
+
 CustomQGraphicsView::CustomQGraphicsView(QWidget *parent)
     : QGraphicsView(parent) {}
+
 
 void CustomQGraphicsView::wheelEvent(QWheelEvent *event) {
     const QPoint angleDelta = event->angleDelta();
