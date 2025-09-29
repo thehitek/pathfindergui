@@ -13,24 +13,23 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
         mainwindow.ui
+        bfs.cpp graphicssceneview.cpp gridcell.cpp main.cpp mainwindow.cpp
+        bfs.h graphicssceneview.h gridcell.h mainwindow.h
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     find_package(Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Core)
 
     qt_add_executable(pathfindergui
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        customqgraphicsview.h customqgraphicsview.cpp
-        gridcell.h gridcell.cpp
-        bfs.h bfs.cpp
+        gridmodel.h gridmodel.cpp
+        cellitem.h cellitem.cpp
+        types.h
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET pathfindergui APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -51,7 +50,6 @@ else()
 endif()
 
 target_link_libraries(pathfindergui PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(pathfindergui PRIVATE Qt6::Core)
 target_link_libraries(pathfindergui PRIVATE Qt6::Core)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

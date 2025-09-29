@@ -2,12 +2,7 @@
 #define BFS_H
 
 #include <QQueue>
-#include <QPair>
-
-template<typename T>
-using DDArray = QList<QList<T>>; /* Double Dimension Array */
-
-typedef QPair<int, int> IntPair;
+#include "types.h"
 
 class BFS
 {

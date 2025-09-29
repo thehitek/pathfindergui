@@ -1,10 +1,7 @@
-#include <QRandomGenerator>
 #include <QSettings>
-#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "gridcell.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -14,19 +11,34 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     initConnections();
     readSettings();
+
+    m_gridModel = new GridModel(this);
+    ui->graphicsView->setModel(m_gridModel);
 }
 
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete m_scene;
 }
 
 
 void MainWindow::initConnections()
 {
-    connect(ui->generateButton, &QPushButton::clicked, this, &MainWindow::onGenerateButtonClicked);
+    connect(ui->generateButton, &QPushButton::clicked, this, [&](){
+        // pass required values into model and call the handler
+        const int sz = ui->cellSizeSpinBox->value();
+        const int rate = ui->obstaclesPercentSpinBox->value();
+        const int w = ui->widthSpinBox->value();
+        const int h = ui->heightSpinBox->value();
+
+        ui->graphicsView->model()->setCellSize(sz);
+        ui->graphicsView->model()->setObstacleSpawnRate(rate);
+        ui->graphicsView->model()->setRowsAndColumns(h, w);
+        ui->graphicsView->onGenerateButtonClick();
+    });
+    connect(ui->graphicsView->scene(), &QGraphicsScene::selectionChanged, ui->graphicsView, &GraphicsSceneView::onSceneSelectionChange);
+
 }
 
 
@@ -42,84 +54,4 @@ void MainWindow::readSettings()
 {
     QSettings settings(QString("config.ini"), QSettings::IniFormat);
     restoreGeometry(settings.value("geometry").toByteArray());
-}
-
-
-void MainWindow::onGenerateButtonClicked()
-{
-    if (m_scene != nullptr) delete m_scene;
-    m_cellFrom.reset();
-    m_cellTo.reset();
-
-    m_scene = new QGraphicsScene(ui->graphicsView);
-    connect(m_scene, &QGraphicsScene::selectionChanged, this, &MainWindow::onSceneSelectionChanged);
-
-    const int maxHeight = ui->heightSpinBox->value();
-    const int maxWidth = ui->widthSpinBox->value();
-    const int obstacleSpawnPercent = ui->obstaclesPercentSpinBox->value();
-    const int cellSize = ui->cellSizeSpinBox->value();
-
-    auto randomizer = QRandomGenerator::global();
-
-    for (int i = 0; i < maxWidth; i++){
-        for (int j = 0; j < maxHeight; j++){
-            int randomPercent = randomizer->bounded(0, 100);
-            bool isObstacle = randomPercent < obstacleSpawnPercent;
-            GridCell* cell = new GridCell(i, j, isObstacle, cellSize);
-            m_scene->addItem(cell);
-        }
-    }
-
-    ui->graphicsView->setScene(m_scene);
-}
-
-
-void MainWindow::onSceneSelectionChanged() {
-    auto selectedItems = m_scene->selectedItems();
-    if (selectedItems.isEmpty()) return;
-
-    auto selectedCell = static_cast<GridCell *>(selectedItems.first());
-
-    if (selectedCell->isObstacle()) {
-        QMessageBox msgBox;
-        msgBox.setText("This cell is an obstacle, please select another one.");
-        msgBox.exec();
-        return;
-    }
-
-    if (m_cellFrom == std::nullopt && m_cellTo == std::nullopt) {
-        selectedCell->setPen(QPen(Qt::yellow, 2));
-        m_cellFrom = IntPair(selectedCell->xPos(), selectedCell->yPos());
-    }
-    else if (m_cellFrom != std::nullopt && m_cellTo == std::nullopt) {
-        selectedCell->setPen(QPen(Qt::blue, 2));
-        m_cellTo = IntPair(selectedCell->xPos(), selectedCell->yPos());
-
-        const int maxHeight = ui->heightSpinBox->value();
-        const int maxWidth = ui->widthSpinBox->value();
-        const int cellSize = ui->cellSizeSpinBox->value();
-
-        DDArray<bool> cellAvailability(maxWidth);
-        cellAvailability.fill(QList<bool>(maxHeight));
-
-        const auto items = m_scene->items();
-
-        for (auto item: items) {
-            auto cell = static_cast<GridCell *>(item);
-            cellAvailability[cell->xPos()][cell->yPos()] = !cell->isObstacle();
-        }
-
-        BFS bfs(cellAvailability, m_cellFrom.value(), m_cellTo.value());
-        bfs.calculate();
-
-        const auto p = bfs.getPath();
-
-        for (const auto &cell: p) {
-            auto item = m_scene->itemAt(QPointF(cell.first * cellSize, cell.second * cellSize), QTransform());
-            if (item != nullptr) {
-                auto cell = static_cast<QGraphicsRectItem *>(item);
-                cell->setBrush(QBrush(Qt::green));
-            }
-        }
-    }
 }
