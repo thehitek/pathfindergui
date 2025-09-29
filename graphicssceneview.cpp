@@ -1,4 +1,3 @@
-#include <QRandomGenerator>
 #include <QMessageBox>
 
 #include "graphicssceneview.h"
@@ -11,6 +10,7 @@ GraphicsSceneView::GraphicsSceneView(QWidget *parent)
 {
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
+    qRegisterMetaType<CellItem>("CellItem");
 }
 
 GraphicsSceneView::~GraphicsSceneView()
@@ -26,22 +26,21 @@ void GraphicsSceneView::setModel(GridModel *model)
 void GraphicsSceneView::onGenerateButtonClick()
 {
     m_scene->clear();
+    m_cellFrom.reset();
+    m_cellTo.reset();
 
     // get data from the model
     const int  maxWidth = m_model->columnCount();
     const int maxHeight = m_model->rowCount();
-
-    const int obstacleSpawnPercent = m_model->obstacleSpawnRate();
     const int cellSize = m_model->cellSize();
 
-    auto randomizer = QRandomGenerator::global();
 
     for (int i = 0; i < maxWidth; i++){
         for (int j = 0; j < maxHeight; j++){
-            int randomPercent = randomizer->bounded(0, 100);
-            bool isObstacle = randomPercent < obstacleSpawnPercent;
-            GridCell* cell = new GridCell(i, j, isObstacle, cellSize);
-            m_scene->addItem(cell);
+            auto qvar = m_model->data(m_model->index(i, j), Qt::DisplayRole);
+            CellItem *item = qvar.value<CellItem *>();
+
+            m_scene->addItem(new GridCell(item->row(), item->column(), item->obstacle(), cellSize));
         }
     }
 }

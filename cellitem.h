@@ -1,13 +1,18 @@
 #ifndef CELLITEM_H
 #define CELLITEM_H
+
+#include <QObject>
 #include <QMetaType>
 
-class CellItem
+class CellItem : public QObject
 {
+    Q_OBJECT
 public:
-    CellItem(bool isObstacle, int row, int column);
+    explicit CellItem(bool isObstacle, int row, int column, QObject *parent = nullptr);
 
     bool obstacle() const;
+    int row() const;
+    int column() const;
 
 private:
     bool m_obstacle;

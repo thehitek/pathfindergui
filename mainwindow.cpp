@@ -35,6 +35,9 @@ void MainWindow::initConnections()
         ui->graphicsView->model()->setCellSize(sz);
         ui->graphicsView->model()->setObstacleSpawnRate(rate);
         ui->graphicsView->model()->setRowsAndColumns(h, w);
+
+        ui->graphicsView->model()->createNewBoard();
+
         ui->graphicsView->onGenerateButtonClick();
     });
     connect(ui->graphicsView->scene(), &QGraphicsScene::selectionChanged, ui->graphicsView, &GraphicsSceneView::onSceneSelectionChange);

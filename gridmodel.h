@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "cellitem.h"
+#include "types.h"
 
 class GridModel : public QAbstractTableModel
 {
@@ -24,8 +25,10 @@ public:
     void setObstacleSpawnRate(int newObstacleSpawnRate);
     void setRowsAndColumns(int rows, int columns);
 
+    void createNewBoard();
+
 private:
-    QList<QList<CellItem>> m_cells;
+    DDArray<CellItem *> m_cells;
 
     int m_rows;
     int m_columns;

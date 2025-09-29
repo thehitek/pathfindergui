@@ -19,7 +19,6 @@ public:
     void setModel(GridModel *model);
 
     QGraphicsScene *scene() const;
-
     GridModel *model() const;
 
 public slots:
