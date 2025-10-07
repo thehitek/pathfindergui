@@ -8,9 +8,9 @@
 class GridCell : public QGraphicsRectItem
 {
 public:
-    GridCell(int xPos, int yPos, bool obstacle = false, int sizeInPixels = 30);
+    explicit GridCell(int xPos, int yPos, bool obstacle = false, int sizeInPixels = 30);
 
-    bool isObstacle();
+    bool isObstacle() const;
 
     int xPos() const;
     int yPos() const;

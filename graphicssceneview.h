@@ -13,7 +13,7 @@ class GraphicsSceneView : public QGraphicsView
 {
     Q_OBJECT
 public:
-    GraphicsSceneView(QWidget *parent = nullptr);
+    explicit GraphicsSceneView(QWidget *parent = nullptr);
     ~GraphicsSceneView();
 
     void setModel(GridModel *model);

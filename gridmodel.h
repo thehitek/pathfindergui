@@ -11,7 +11,7 @@ class GridModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    GridModel(QObject* parent = nullptr);
+    explicit GridModel(QObject* parent = nullptr);
 
     // Реализация интерфейса модели данных таблицы
     virtual int	rowCount(const QModelIndex &parent = QModelIndex()) const;

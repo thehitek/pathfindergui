@@ -23,7 +23,7 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::initConnections()
+void MainWindow::initConnections() const
 {
     connect(ui->generateButton, &QPushButton::clicked, this, [&](){
         // pass required values into model and call the handler

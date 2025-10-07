@@ -25,7 +25,7 @@ GridCell::GridCell(int xPos, int yPos, bool obstacle, int sizeInPixels)
 }
 
 
-bool GridCell::isObstacle() { return m_obstacleState; }
+bool GridCell::isObstacle() const { return m_obstacleState; }
 
 int GridCell::xPos() const
 {

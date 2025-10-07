@@ -2,12 +2,13 @@
 #define BFS_H
 
 #include <QQueue>
+
 #include "types.h"
 
 class BFS
 {
 public:
-    BFS(DDArray<bool> &cellAvailability, IntPair cellFrom, IntPair cellTo);
+    explicit BFS(DDArray<bool> &cellAvailability, IntPair cellFrom, IntPair cellTo);
 
     void calculate();
     QList<IntPair> getPath();

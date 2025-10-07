@@ -6,7 +6,6 @@
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
 
-#include "bfs.h"
 #include "gridmodel.h"
 
 
@@ -21,14 +20,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    void initConnections();
+    void initConnections() const;
     void readSettings();
 
     Ui::MainWindow* ui = nullptr;
